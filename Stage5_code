@@ -1,0 +1,101 @@
+from random import choice
+import time
+
+
+class RockPaperScissors:
+    def __init__(self):
+        # initialize game parameters
+        self.draw_increment = 50
+        self.winning_increment = 100
+        self.game_symbols = list()  # pay attention to this one
+        self.welcome_message = 'Okay, let\'s start'
+        self.game_combinations = dict()
+
+    def user_interface(self):
+        # initialize user details: name and score
+        self.user_name = input('Enter your name: ')
+        print(f'Hello, {self.user_name}')
+        # initalize user rating data
+        RockPaperScissors.score_script(self)
+        # take game symbols from user
+        self.game_symbols = input().split(',')
+        # print(self.game_symbols, len(self.game_symbols))
+        print(self.welcome_message)
+        # initialize current game
+        RockPaperScissors.play_game(self)
+
+    def score_script(self):
+        rating_file = open('rating.txt', 'r')
+        # check if user rating is written in the file
+        for item in rating_file.readlines():
+            # print(item.rstrip('\n'))
+            if item.rstrip('\n').split()[0] == self.user_name:
+                self.user_score = int(item.rstrip('\n').split()[1])
+                break
+            else:
+                self.user_score = 0
+
+    # classic game script with 3 basic elements - rock, paper, scissors
+    def play_game(self):
+        # check which type of game user wants to play - classic or user
+        if len(self.game_symbols) == 1:
+            # initialize classic game set-up
+            self.game_symbols = [
+                'rock', 'paper', 'scissors', '!rating', '!exit'
+            ]
+            self.game_combinations = dict(
+                rock="paper", paper="scissors", scissors="rock")
+        else:
+            # initialize user game set-up
+            for symbol in self.game_symbols:
+                symbol_index = self.game_symbols.index(symbol) + 1
+                slicing_length = len(self.game_symbols) // 2 + symbol_index
+                self.game_combinations[symbol] = self.game_symbols[
+                    symbol_index:slicing_length]
+                if len(self.game_symbols[symbol_index:slicing_length]) < len(
+                        self.game_symbols) // 2:
+                    self.game_combinations[symbol].extend(self.game_symbols[:(
+                        symbol_index - len(self.game_symbols) // 2 - 1)])
+
+        # initialize game loop
+        while True:
+            self.user_symbol = input()
+            # process '!exit' option
+            if self.user_symbol == '!exit':
+                print('Bye!')
+                break
+            # process '!rating' option
+            if self.user_symbol == '!rating':
+                print(f'Your rating: {self.user_score}')
+                continue
+            # check if user input is valid
+            if self.user_symbol not in self.game_symbols:
+                print('Invalid input')
+                continue
+            # initialize computer choice for current game
+            self.computer_symbol = choice(list(self.game_combinations.keys()))
+            # check if game result is draw
+            if self.user_symbol == self.computer_symbol:
+                print(RockPaperScissors.output(self, game_status='Draw'))
+                continue
+            if self.computer_symbol in self.game_combinations[self.
+                                                              user_symbol]:
+                print(RockPaperScissors.output(self, game_status='Lose'))
+                continue
+            else:
+                print(RockPaperScissors.output(self, game_status='Win'))
+                continue
+
+    def output(self, game_status):
+        if game_status == 'Draw':
+            self.user_score += self.draw_increment
+            return f'There is a draw ({self.computer_symbol})'
+        elif game_status == 'Win':
+            self.user_score += self.winning_increment
+            return f'Well done. Computer chose {self.computer_symbol} and failed'
+        elif game_status == 'Lose':
+            return f'Sorry, but computer chose {self.computer_symbol}'
+
+
+game = RockPaperScissors()
+game.user_interface()
