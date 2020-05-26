@@ -1,5 +1,4 @@
 from random import choice
-import time
 
 
 class RockPaperScissors:
@@ -25,15 +24,15 @@ class RockPaperScissors:
         RockPaperScissors.play_game(self)
 
     def score_script(self):
-        rating_file = open('rating.txt', 'r')
         # check if user rating is written in the file
-        for item in rating_file.readlines():
-            # print(item.rstrip('\n'))
-            if item.rstrip('\n').split()[0] == self.user_name:
-                self.user_score = int(item.rstrip('\n').split()[1])
-                break
-            else:
-                self.user_score = 0
+        with open('rating.txt', 'r') as rating_file:
+            for item in rating_file.readlines():
+                # print(item.rstrip('\n'))
+                if item.rstrip('\n').split()[0] == self.user_name:
+                    self.user_score = int(item.rstrip('\n').split()[1])
+                    break
+                else:
+                    self.user_score = 0
 
     # classic game script with 3 basic elements - rock, paper, scissors
     def play_game(self):
